@@ -26,15 +26,27 @@ char keys[ROWS][COLS] = {
  StanSystemu obecnyStan =  CZEKAM_NA_PIN;
  String tajnyPin = "1234";
  String wpisanyPin = "";
+ const byte PIN_BUZZER = A0;
+ const byte PIN_LED_ZIELONA = A1;
+ const byte PIN_LED_CZERWONA = A2;
+
  
  Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
   Serial.begin(115200);
+  
+
   Serial.println("System kontroli dostepu gotowy.");
   Serial.println("Wprowadz PIN");
 
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_LED_ZIELONA, OUTPUT);
+  pinMode(PIN_LED_CZERWONA, OUTPUT);
 
+  digitalWrite(PIN_BUZZER, LOW);
+  digitalWrite(PIN_LED_CZERWONA, HIGH);
+  digitalWrite(PIN_LED_ZIELONA, LOW);
 }
 
 void loop() {
@@ -70,7 +82,11 @@ void loop() {
     case ZAAKCEPTOWANY:
       Serial.println("-->DOSTEP PRZYZNANY");
       Serial.println("-->ZAMEK OTWARTY NA 3 SEKUNDY");
+      digitalWrite(PIN_LED_CZERWONA, LOW);
+      digitalWrite(PIN_LED_ZIELONA, HIGH);
       delay(3000);
+      digitalWrite(PIN_LED_ZIELONA, LOW);
+      digitalWrite(PIN_LED_CZERWONA, HIGH);
       Serial.println("-->ZAMEK ZAMKNIETY");
       Serial.println("\n-->WPROWADZ PIN:");
 
@@ -82,7 +98,11 @@ void loop() {
 
     case ODRZUCONY:
     Serial.println("-->ODMOWA DOSTEPU");
-    delay(3000);
+    digitalWrite(PIN_BUZZER, HIGH);
+    delay(2000);
+    digitalWrite(PIN_BUZZER, LOW);
+
+
     Serial.println("\n-->SPROBOJ PONOWNIE, WPROWADZ PIN:");
     wpisanyPin = "";
     obecnyStan = CZEKAM_NA_PIN;
