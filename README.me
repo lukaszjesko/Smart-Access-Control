@@ -1,0 +1,41 @@
+1. Opis Projektu
+Budujemy profesjonalny system kontroli dostępu oparty na mikrokontrolerze Arduino Nano (klon, stary bootloader). System docelowo będzie weryfikował użytkownika za pomocą karty RFID, a następnie prosił o 4-cyfrowy kod PIN na klawiaturze matrycowej.
+
+2. Aktualny stan oprogramowania (Faza 1 ukończona)
+
+
+Środowisko: Visual Studio Code + PlatformIO.
+
+
+Baud rate: 115200 bodów.
+
+
+Biblioteki w platformio.ini: marcoschwartz/LiquidCrystal_I2C, chris--a/Keypad.
+
+
+Logika: Zaimplementowana Maszyna Stanów (FSM) sterująca zamkiem. Posiada obecnie 4 stany: CZEKAM_NA_PIN, WPISYWANIE_PINU, ZAAKCEPTOWANY, ODRZUCONY. Działa czyszczenie bufora wpisywania oraz kary czasowe za błędny PIN.
+
+
+Sygnalizacja: System posiada zintegrowany alarm (buzzer aktywny) na zły PIN oraz sygnalizację LED.
+
+3. Mapa połączeń sprzętowych (Pinout)
+
+Wyświetlacz LCD 16x2 z modułem I2C:
+
+SDA -> A4 
+
+SCL -> A5 
+
+Klawiatura Matrycowa 4x4:
+
+Rzędy (R1-R4) -> piny D6, D7, D8, D9 
+
+Kolumny (C1-C4) -> piny D5, D4, D3, D2 
+
+Sygnalizacja (Wyjścia cyfrowe z rezystorami na masie):
+
+Buzzer (Aktywny) -> A0 
+
+Dioda Zielona (Sukces) -> A1 
+
+Dioda Czerwona (Czuwanie/Alarm) -> A2
