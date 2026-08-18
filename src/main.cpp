@@ -3,6 +3,7 @@
 #include <Keypad.h>
 #include <LiquidCrystal_I2C.h>
 
+
 const byte ROWS = 4; 
 const byte COLS = 4;
 
@@ -20,21 +21,25 @@ char keys[ROWS][COLS] = {
     CZEKAM_NA_PIN,
     WPISYWANIE_PINU,
     ZAAKCEPTOWANY,
-    ODRZUCONY
+    ODRZUCONY,
+    CZEKAM_NA_KARTE
  };
 
- StanSystemu obecnyStan =  CZEKAM_NA_PIN;
+ StanSystemu obecnyStan = CZEKAM_NA_PIN;
+
  String tajnyPin = "1234";
  String wpisanyPin = "";
  const byte PIN_BUZZER = A0;
  const byte PIN_LED_ZIELONA = A1;
  const byte PIN_LED_CZERWONA = A2;
-
+ const byte PIN_PRZEKAZNIK = A3;
  
  Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
+
   Serial.begin(115200);
+  digitalWrite(PIN_PRZEKAZNIK, LOW);
   
 
   Serial.println("System kontroli dostepu gotowy.");
@@ -43,14 +48,17 @@ void setup() {
   pinMode(PIN_BUZZER, OUTPUT);
   pinMode(PIN_LED_ZIELONA, OUTPUT);
   pinMode(PIN_LED_CZERWONA, OUTPUT);
+  pinMode(PIN_PRZEKAZNIK, OUTPUT);
 
   digitalWrite(PIN_BUZZER, LOW);
   digitalWrite(PIN_LED_CZERWONA, HIGH);
   digitalWrite(PIN_LED_ZIELONA, LOW);
+
 }
 
 void loop() {
   char key = keypad.getKey();
+  
   switch (obecnyStan){
     case CZEKAM_NA_PIN:
       if (key){
@@ -79,12 +87,18 @@ void loop() {
       }
     break;
 
+    case CZEKAM_NA_KARTE:
+      
+    break;
+
     case ZAAKCEPTOWANY:
       Serial.println("-->DOSTEP PRZYZNANY");
       Serial.println("-->ZAMEK OTWARTY NA 3 SEKUNDY");
       digitalWrite(PIN_LED_CZERWONA, LOW);
       digitalWrite(PIN_LED_ZIELONA, HIGH);
+      digitalWrite(PIN_PRZEKAZNIK, HIGH);
       delay(3000);
+      digitalWrite(PIN_PRZEKAZNIK, LOW);
       digitalWrite(PIN_LED_ZIELONA, LOW);
       digitalWrite(PIN_LED_CZERWONA, HIGH);
       Serial.println("-->ZAMEK ZAMKNIETY");
@@ -110,9 +124,4 @@ void loop() {
     
     break;
   }
-      
-      
-
-    
-  
 }
