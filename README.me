@@ -1,41 +1,170 @@
-1. Opis Projektu
-Budujemy profesjonalny system kontroli dostępu oparty na mikrokontrolerze Arduino Nano (klon, stary bootloader). System docelowo będzie weryfikował użytkownika za pomocą karty RFID, a następnie prosił o 4-cyfrowy kod PIN na klawiaturze matrycowej.
+# 🚪 Smart Access Control System (Zamek RFID + PIN)
 
-2. Aktualny stan oprogramowania (Faza 1 ukończona)
+## 📖 1. Opis Projektu
+Profesjonalny system kontroli dostępu oparty na mikrokontrolerze Arduino Nano (klon, stary bootloader). 
+System weryfikuje użytkownika za pomocą karty zbliżeniowej RFID (RC522), a następnie prosi o 4-cyfrowy kod PIN wprowadzany na matrycowej klawiaturze membranowej. Całość komunikuje się z użytkownikiem za pomocą ekranu LCD (I2C) oraz sygnalizacji świetlno-dźwiękowej. 
 
+Projekt prowadzony w standardzie **Monorepo** – łączy kod oprogramowania (C++) z projektem sprzętowym (KiCad) w jednym miejscu.
 
-Środowisko: Visual Studio Code + PlatformIO.
+## 🚀 2. Aktualny stan projektu
 
+### 💻 Oprogramowanie (Software - C++ / PlatformIO) - Faza 1: UKOŃCZONA
+- **Baud rate:** 115200 bodów.
+- **Zależności:** `marcoschwartz/LiquidCrystal_I2C`, `chris--a/Keypad`.
+- **Architektura:** Wzorzec Maszyny Stanów (FSM - Finite State Machine).
+- **Zaimplementowane stany:** `CZEKAM_NA_PIN`, `WPISYWANIE_PINU`, `ZAAKCEPTOWANY`, `ODRZUCONY`. 
+- **Funkcjonalność:** Działa odczyt z klawiatury, buforowanie loginu, weryfikacja z wpisanym na sztywno PIN-em ("1234"), sterowanie przekaźnikiem na 3 sekundy oraz pełna obsługa alarmu (buzzer + LED).
+- **Do zrobienia:** Implementacja magistrali SPI oraz biblioteki MFRC522 do obsługi stanu `CZEKAM_NA_KARTE`.
 
-Baud rate: 115200 bodów.
+### 🔌 Sprzęt (Hardware - KiCad) - Faza 1: UKOŃCZONA
+- **Schemat Ideowy:** Zaprojektowany, użyto profesjonalnych etykiet sygnałowych (Net Labels).
+- **Weryfikacja ERC:** Test układu zasilania i reguł elektrycznych (Electrical Rules Checker) ukończony z wynikiem: **0 błędów, 0 ostrzeżeń**.
+- **Zasilanie:** Rozdzielone napięcia 5V (dla logiki, LCD i przekaźnika) oraz bezpieczne 3.3V (dla czytnika SPI RC522).
+- **Do zrobienia:** Przypisanie obudów (Footprintów), wygenerowanie modelu 3D oraz trasowanie ścieżek na płytce PCB.
 
+---
 
-Biblioteki w platformio.ini: marcoschwartz/LiquidCrystal_I2C, chris--a/Keypad.
+## 🗺️ 3. Mapa połączeń sprzętowych (Pinout)
 
+### Magistrale Komunikacyjne:
+* **Wyświetlacz LCD 16x2 (I2C):**
+    * SDA -> `A4`
+    * SCL -> `A5`
+* **Czytnik RFID RC522 (SPI) - *Zasilanie 3.3V!*:**
+    * SDA (SS) -> `D10`
+    * MOSI -> `D11`
+    * MISO -> `D12`
+    * SCK -> `D13`
+    * IRQ -> *Niepodłączony (Q)*
 
-Logika: Zaimplementowana Maszyna Stanów (FSM) sterująca zamkiem. Posiada obecnie 4 stany: CZEKAM_NA_PIN, WPISYWANIE_PINU, ZAAKCEPTOWANY, ODRZUCONY. Działa czyszczenie bufora wpisywania oraz kary czasowe za błędny PIN.
+### Klawiatura Matrycowa 4x4:
+* Rzędy (R1-R4) -> `D6`, `D7`, `D8`, `D9`
+* Kolumny (C1-C4) -> `D5`, `D4`, `D3`, `D2`
 
+### Sygnalizacja i Wykonawstwo (Wyjścia cyfrowe):
+* Buzzer (Aktywny) -> `A0`
+* Dioda Zielona (Sukces) -> `A1`
+* Dioda Czerwona (Czuwanie/Alarm) -> `A2`
+* Przekaźnik (Otwieranie zamka) -> `A3`
 
-Sygnalizacja: System posiada zintegrowany alarm (buzzer aktywny) na zły PIN oraz sygnalizację LED.
+---
 
-3. Mapa połączeń sprzętowych (Pinout)
+## 💾 4. Główny kod sterujący (main.cpp)
 
-Wyświetlacz LCD 16x2 z modułem I2C:
+```cpp
+#include <Arduino.h>
+#include <Wire.h>
+#include <Keypad.h>
+#include <LiquidCrystal_I2C.h>
 
-SDA -> A4 
+const byte ROWS = 4; 
+const byte COLS = 4;
 
-SCL -> A5 
+byte rowPins[ROWS] = {6,7,8,9};
+byte colPins[COLS] = {5,4,3,2};
 
-Klawiatura Matrycowa 4x4:
+char keys[ROWS][COLS] = {
+ {'1','2','3','A'},
+ {'4','5','6','B'},
+ {'7','8','9','C'},
+ {'*','0','#','D'}
+ };
 
-Rzędy (R1-R4) -> piny D6, D7, D8, D9 
+ enum StanSystemu {
+    CZEKAM_NA_PIN,
+    WPISYWANIE_PINU,
+    ZAAKCEPTOWANY,
+    ODRZUCONY,
+    CZEKAM_NA_KARTE
+ };
 
-Kolumny (C1-C4) -> piny D5, D4, D3, D2 
+ StanSystemu obecnyStan = CZEKAM_NA_PIN;
 
-Sygnalizacja (Wyjścia cyfrowe z rezystorami na masie):
+ String tajnyPin = "1234";
+ String wpisanyPin = "";
+ const byte PIN_BUZZER = A0;
+ const byte PIN_LED_ZIELONA = A1;
+ const byte PIN_LED_CZERWONA = A2;
+ const byte PIN_PRZEKAZNIK = A3;
+ 
+ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-Buzzer (Aktywny) -> A0 
+void setup() {
+  Serial.begin(115200);
+  digitalWrite(PIN_PRZEKAZNIK, LOW);
+  
+  Serial.println("System kontroli dostepu gotowy.");
+  Serial.println("Wprowadz PIN");
 
-Dioda Zielona (Sukces) -> A1 
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_LED_ZIELONA, OUTPUT);
+  pinMode(PIN_LED_CZERWONA, OUTPUT);
+  pinMode(PIN_PRZEKAZNIK, OUTPUT);
 
-Dioda Czerwona (Czuwanie/Alarm) -> A2
+  digitalWrite(PIN_BUZZER, LOW);
+  digitalWrite(PIN_LED_CZERWONA, HIGH);
+  digitalWrite(PIN_LED_ZIELONA, LOW);
+}
+
+void loop() {
+  char key = keypad.getKey();
+  
+  switch (obecnyStan){
+    case CZEKAM_NA_PIN:
+      if (key){
+        wpisanyPin+= key;
+        Serial.print("*");
+        obecnyStan = WPISYWANIE_PINU;
+      }
+    break;
+
+    case WPISYWANIE_PINU:
+      if(key){
+        wpisanyPin += key;
+        Serial.print("*");
+
+        if (wpisanyPin.length() == 4){
+          Serial.println();
+
+          if (wpisanyPin == tajnyPin){
+            obecnyStan = ZAAKCEPTOWANY;
+          }else{
+            obecnyStan = ODRZUCONY;
+          }
+        }
+      }
+    break;
+
+    case CZEKAM_NA_KARTE:
+      // Tu bedzie logika zczytywania kart RFID po SPI
+    break;
+
+    case ZAAKCEPTOWANY:
+      Serial.println("-->DOSTEP PRZYZNANY");
+      Serial.println("-->ZAMEK OTWARTY NA 3 SEKUNDY");
+      digitalWrite(PIN_LED_CZERWONA, LOW);
+      digitalWrite(PIN_LED_ZIELONA, HIGH);
+      digitalWrite(PIN_PRZEKAZNIK, HIGH);
+      delay(3000);
+      digitalWrite(PIN_PRZEKAZNIK, LOW);
+      digitalWrite(PIN_LED_ZIELONA, LOW);
+      digitalWrite(PIN_LED_CZERWONA, HIGH);
+      Serial.println("-->ZAMEK ZAMKNIETY");
+      Serial.println("\n-->WPROWADZ PIN:");
+
+      wpisanyPin = "";
+      obecnyStan = CZEKAM_NA_PIN;
+    break;
+
+    case ODRZUCONY:
+    Serial.println("-->ODMOWA DOSTEPU");
+    digitalWrite(PIN_BUZZER, HIGH);
+    delay(2000);
+    digitalWrite(PIN_BUZZER, LOW);
+
+    Serial.println("\n-->SPROBOJ PONOWNIE, WPROWADZ PIN:");
+    wpisanyPin = "";
+    obecnyStan = CZEKAM_NA_PIN;
+    break;
+  }
+}
