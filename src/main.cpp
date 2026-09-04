@@ -2,7 +2,13 @@
 #include <Wire.h>
 #include <Keypad.h>
 #include <LiquidCrystal_I2C.h>
+#include <SPI.h>
+#include <MFRC522.h>
 
+#define SDA_PIN 10
+#define RST_PIN -1
+
+MFRC522 rfid(SDA_PIN, RST_PIN);
 
 
 const byte ROWS = 4; 
@@ -26,7 +32,7 @@ char keys[ROWS][COLS] = {
     CZEKAM_NA_KARTE
  };
 
- StanSystemu obecnyStan = CZEKAM_NA_PIN;
+ StanSystemu obecnyStan = CZEKAM_NA_KARTE;
 
  String tajnyPin = "1234";
  String wpisanyPin = "";
@@ -34,10 +40,15 @@ char keys[ROWS][COLS] = {
  const byte PIN_LED_ZIELONA = A1;
  const byte PIN_LED_CZERWONA = A2;
  const byte PIN_PRZEKAZNIK = A3;
+
+
  
  Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
+  SPI.begin();
+  rfid.PCD_Init();
+
 
   Serial.begin(115200);
   digitalWrite(PIN_PRZEKAZNIK, LOW);
@@ -89,6 +100,24 @@ void loop() {
     break;
 
     case CZEKAM_NA_KARTE:
+      if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+        
+        Serial.print("Karta wykryta! UID: ");
+        
+        for (byte i = 0; i < rfid.uid.size; i++) {
+          Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+          Serial.print(rfid.uid.uidByte[i], HEX);
+        }
+        Serial.println(); 
+        
+        rfid.PICC_HaltA(); 
+
+        obecnyStan = CZEKAM_NA_PIN; 
+      }
+    break;
+
+
+
       
     break;
 
@@ -106,7 +135,7 @@ void loop() {
       Serial.println("\n-->WPROWADZ PIN:");
 
       wpisanyPin = "";
-      obecnyStan = CZEKAM_NA_PIN;
+      obecnyStan = CZEKAM_NA_KARTE;
 
 
     break;
@@ -120,7 +149,7 @@ void loop() {
 
     Serial.println("\n-->SPROBOJ PONOWNIE, WPROWADZ PIN:");
     wpisanyPin = "";
-    obecnyStan = CZEKAM_NA_PIN;
+    obecnyStan = CZEKAM_NA_KARTE;
 
     
     break;
