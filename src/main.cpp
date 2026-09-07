@@ -9,6 +9,7 @@
 #define RST_PIN -1
 
 MFRC522 rfid(SDA_PIN, RST_PIN);
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
 
 
 const byte ROWS = 4; 
@@ -105,32 +106,17 @@ void loop() {
         Serial.print("Karta wykryta! UID: ");
         
         String odczytaneUID = "";
-        for (byte i = 0; i < rfid.uid.size; i++) {
-          
-          
+        for (byte i = 0; i < rfid.uid.size; i++) {         
           odczytaneUID.concat(String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " "));
-          
           odczytaneUID.concat(String(rfid.uid.uidByte[i], HEX));
         }
-        
         odczytaneUID.toUpperCase(); 
-        
-
-        Serial.println(odczytaneUID); 
-        
-        rfid.PICC_HaltA(); 
-
+        Serial.println(odczytaneUID);
+        rfid.PICC_HaltA();
         digitalWrite(PIN_BUZZER, HIGH); delay(100); digitalWrite(PIN_BUZZER, LOW); 
-
         Serial.println("-> Karta zeskanowana. Podaj PIN:");
-        
         obecnyStan = CZEKAM_NA_PIN; 
       }
-    break;
-
-
-
-      
     break;
 
     case ZAAKCEPTOWANY:
@@ -149,7 +135,6 @@ void loop() {
       wpisanyPin = "";
       obecnyStan = CZEKAM_NA_KARTE;
 
-
     break;
 
     case ODRZUCONY:
@@ -157,13 +142,10 @@ void loop() {
     digitalWrite(PIN_BUZZER, HIGH);
     delay(2000);
     digitalWrite(PIN_BUZZER, LOW);
-
-
     Serial.println("\n-->SPROBOJ PONOWNIE, WPROWADZ PIN:");
     wpisanyPin = "";
     obecnyStan = CZEKAM_NA_KARTE;
 
-    
     break;
   }
 }
