@@ -104,14 +104,26 @@ void loop() {
         
         Serial.print("Karta wykryta! UID: ");
         
+        String odczytaneUID = "";
         for (byte i = 0; i < rfid.uid.size; i++) {
-          Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
-          Serial.print(rfid.uid.uidByte[i], HEX);
+          
+          
+          odczytaneUID.concat(String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " "));
+          
+          odczytaneUID.concat(String(rfid.uid.uidByte[i], HEX));
         }
-        Serial.println(); 
+        
+        odczytaneUID.toUpperCase(); 
+        
+
+        Serial.println(odczytaneUID); 
         
         rfid.PICC_HaltA(); 
 
+        digitalWrite(PIN_BUZZER, HIGH); delay(100); digitalWrite(PIN_BUZZER, LOW); 
+
+        Serial.println("-> Karta zeskanowana. Podaj PIN:");
+        
         obecnyStan = CZEKAM_NA_PIN; 
       }
     break;

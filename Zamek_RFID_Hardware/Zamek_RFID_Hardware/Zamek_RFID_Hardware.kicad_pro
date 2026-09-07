@@ -61,7 +61,32 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [],
+      "drc_exclusions": [
+        [
+          "silk_overlap|145780000|100660000|7dc1f429-e8f1-4898-8fcb-2e1bc6edc11a|f6dd4270-40bd-4ee4-b90f-a09a85281685",
+          ""
+        ],
+        [
+          "silk_overlap|145835714|100660000|733a966f-cfec-4e3b-8d65-432398e071b1|f6dd4270-40bd-4ee4-b90f-a09a85281685",
+          ""
+        ],
+        [
+          "silk_overlap|146191905|114234819|95b6fda2-fc17-4e76-bed9-405e279a06b6|f709289f-1418-49f4-9228-33a6462b03bc",
+          ""
+        ],
+        [
+          "silk_overlap|146191905|118520000|2d21c1a2-a54d-49de-ada3-a64f0113f203|98c7cb54-ecc6-48ad-8238-1666a96de844",
+          ""
+        ],
+        [
+          "silk_overlap|152467683|85841440|383eaba3-0f48-49c0-9607-ba35ccb71a1a|5f9dea4a-13db-47e3-8c3c-75b71575713d",
+          ""
+        ],
+        [
+          "starved_thermal|149982303|109217696|eba0ef3e-b116-42c8-b418-916d529dab6e|623a3d9b-0955-4931-ac2c-438b82972abf|B.Cu",
+          ""
+        ]
+      ],
       "meta": {
         "filename": "board_design_settings.json",
         "version": 2
@@ -542,7 +567,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "C:/Users/lukas/OneDrive/Pulpit/Smart-access-control/Zamek_RFID_Hardware/GERBERY_RFID/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
