@@ -35,6 +35,7 @@ char keys[ROWS][COLS] = {
 
  StanSystemu obecnyStan = CZEKAM_NA_KARTE;
 
+ String dozwolonaKarta = "12 34 56 78";
  String tajnyPin = "1234";
  String wpisanyPin = "";
  const byte PIN_BUZZER = A0;
@@ -49,14 +50,15 @@ char keys[ROWS][COLS] = {
 void setup() {
   SPI.begin();
   rfid.PCD_Init();
-
-
   Serial.begin(115200);
   digitalWrite(PIN_PRZEKAZNIK, LOW);
   
-
-  Serial.println("System kontroli dostepu gotowy.");
-  Serial.println("Wprowadz PIN");
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("System gotowy");
+  lcd.setCursor(0, 1);
+  lcd.print("Zbliz karte: ");
 
   pinMode(PIN_BUZZER, OUTPUT);
   pinMode(PIN_LED_ZIELONA, OUTPUT);
@@ -66,17 +68,20 @@ void setup() {
   digitalWrite(PIN_BUZZER, LOW);
   digitalWrite(PIN_LED_CZERWONA, HIGH);
   digitalWrite(PIN_LED_ZIELONA, LOW);
-
 }
 
 void loop() {
   char key = keypad.getKey();
   
-  switch (obecnyStan){
+  switch(obecnyStan){
     case CZEKAM_NA_PIN:
       if (key){
         wpisanyPin+= key;
-        Serial.print("*");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Wprowadz PIN:");
+        lcd.setCursor(0, 1);
+        lcd.print("*");
         obecnyStan = WPISYWANIE_PINU;
 
       }
@@ -85,10 +90,12 @@ void loop() {
     case WPISYWANIE_PINU:
       if(key){
         wpisanyPin += key;
-        Serial.print("*");
+        lcd.print("*");
 
         if (wpisanyPin.length() == 4){
-          Serial.println();
+          lcd.clear();
+          lcd.setCursor(0, 0);
+          lcd.print("Sprawdzanie PINu...");
 
           if (wpisanyPin == tajnyPin){
             obecnyStan = ZAAKCEPTOWANY;
@@ -101,27 +108,57 @@ void loop() {
     break;
 
     case CZEKAM_NA_KARTE:
-      if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
-        
-        Serial.print("Karta wykryta! UID: ");
-        
+      
+      if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {      
         String odczytaneUID = "";
         for (byte i = 0; i < rfid.uid.size; i++) {         
           odczytaneUID.concat(String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " "));
           odczytaneUID.concat(String(rfid.uid.uidByte[i], HEX));
         }
         odczytaneUID.toUpperCase(); 
+        if (odczytaneUID == dozwolonaKarta) { 
+          
         Serial.println(odczytaneUID);
+
         rfid.PICC_HaltA();
         digitalWrite(PIN_BUZZER, HIGH); delay(100); digitalWrite(PIN_BUZZER, LOW); 
-        Serial.println("-> Karta zeskanowana. Podaj PIN:");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Karta OK");
+        lcd.setCursor(0, 1);
+        lcd.print("Wprowadz PIN:");
         obecnyStan = CZEKAM_NA_PIN; 
       }
+      else{
+        Serial.println("Nieznana karta: " + odczytaneUID);
+        rfid.PICC_HaltA();
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Odmowa dostepu");
+        lcd.setCursor(0, 1);
+        lcd.print("Nieznana karta");
+
+        digitalWrite(PIN_BUZZER, HIGH);
+        delay(2000);
+        digitalWrite(PIN_BUZZER, LOW);
+
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("System gotowy");
+        lcd.setCursor(0, 1);
+        lcd.print("Zbliz karte: ");
+        
+      }
+    }
     break;
 
     case ZAAKCEPTOWANY:
-      Serial.println("-->DOSTEP PRZYZNANY");
-      Serial.println("-->ZAMEK OTWARTY NA 3 SEKUNDY");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Dostep przyznany"); // Równe 16 znaków!
+      lcd.setCursor(0, 1);
+      lcd.print("Zamek otwarty");
+      
       digitalWrite(PIN_LED_CZERWONA, LOW);
       digitalWrite(PIN_LED_ZIELONA, HIGH);
       digitalWrite(PIN_PRZEKAZNIK, HIGH);
@@ -129,23 +166,36 @@ void loop() {
       digitalWrite(PIN_PRZEKAZNIK, LOW);
       digitalWrite(PIN_LED_ZIELONA, LOW);
       digitalWrite(PIN_LED_CZERWONA, HIGH);
-      Serial.println("-->ZAMEK ZAMKNIETY");
-      Serial.println("\n-->WPROWADZ PIN:");
+      
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("System gotowy");
+      lcd.setCursor(0, 1);
+      lcd.print("Zbliz karte: ");
 
       wpisanyPin = "";
       obecnyStan = CZEKAM_NA_KARTE;
-
     break;
 
     case ODRZUCONY:
-    Serial.println("-->ODMOWA DOSTEPU");
-    digitalWrite(PIN_BUZZER, HIGH);
-    delay(2000);
-    digitalWrite(PIN_BUZZER, LOW);
-    Serial.println("\n-->SPROBOJ PONOWNIE, WPROWADZ PIN:");
-    wpisanyPin = "";
-    obecnyStan = CZEKAM_NA_KARTE;
-
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Odmowa dostepu!");
+      lcd.setCursor(0, 1);
+      lcd.print("Bledny PIN!");
+      
+      digitalWrite(PIN_BUZZER, HIGH);
+      delay(2000);
+      digitalWrite(PIN_BUZZER, LOW);
+      
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("System gotowy");
+      lcd.setCursor(0, 1);
+      lcd.print("Zbliz karte: ");
+      
+      wpisanyPin = "";
+      obecnyStan = CZEKAM_NA_KARTE;
     break;
   }
 }
