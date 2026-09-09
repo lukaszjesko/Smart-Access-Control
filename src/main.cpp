@@ -35,7 +35,7 @@ char keys[ROWS][COLS] = {
 
  StanSystemu obecnyStan = CZEKAM_NA_KARTE;
 
- String dozwolonaKarta = "12 34 56 78";
+ String dozwolonaKarta = " C3 63 0D 2D";
  String tajnyPin = "1234";
  String wpisanyPin = "";
  const byte PIN_BUZZER = A0;
