@@ -51,7 +51,7 @@ void setup() {
   SPI.begin();
   rfid.PCD_Init();
   Serial.begin(115200);
-  digitalWrite(PIN_PRZEKAZNIK, LOW);
+  digitalWrite(PIN_PRZEKAZNIK, HIGH);
   
   lcd.init();
   lcd.backlight();
@@ -155,15 +155,15 @@ void loop() {
     case ZAAKCEPTOWANY:
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print("Dostep przyznany"); // Równe 16 znaków!
+      lcd.print("Dostep przyznany"); 
       lcd.setCursor(0, 1);
       lcd.print("Zamek otwarty");
       
       digitalWrite(PIN_LED_CZERWONA, LOW);
       digitalWrite(PIN_LED_ZIELONA, HIGH);
-      digitalWrite(PIN_PRZEKAZNIK, HIGH);
-      delay(3000);
       digitalWrite(PIN_PRZEKAZNIK, LOW);
+      delay(3000);
+      digitalWrite(PIN_PRZEKAZNIK, HIGH);
       digitalWrite(PIN_LED_ZIELONA, LOW);
       digitalWrite(PIN_LED_CZERWONA, HIGH);
       
