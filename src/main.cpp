@@ -4,6 +4,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <SPI.h>
 #include <MFRC522.h>
+#include "config.h"
 
 #define SDA_PIN 10
 #define RST_PIN -1
@@ -35,8 +36,7 @@ char keys[ROWS][COLS] = {
 
  StanSystemu obecnyStan = CZEKAM_NA_KARTE;
 
- String dozwolonaKarta = " C3 63 0D 2D";
- String tajnyPin = "1234";
+
  String wpisanyPin = "";
  const byte PIN_BUZZER = A0;
  const byte PIN_LED_ZIELONA = A1;
@@ -47,27 +47,35 @@ char keys[ROWS][COLS] = {
  
  Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
+void pokazLinie(byte wiersz, const char* tekst) {
+  lcd.setCursor(0, wiersz);
+  lcd.print("                "); 
+  lcd.setCursor(0, wiersz);
+  lcd.print(tekst);
+}
+
 void setup() {
+  
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_LED_ZIELONA, OUTPUT);
+  pinMode(PIN_LED_CZERWONA, OUTPUT);
+  pinMode(PIN_PRZEKAZNIK, OUTPUT);
+
+  digitalWrite(PIN_PRZEKAZNIK, HIGH);
+  digitalWrite(PIN_BUZZER, LOW);
+  digitalWrite(PIN_LED_CZERWONA, HIGH);
+  digitalWrite(PIN_LED_ZIELONA, LOW);
+
   SPI.begin();
   rfid.PCD_Init();
   Serial.begin(115200);
-  digitalWrite(PIN_PRZEKAZNIK, HIGH);
-  
+
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print("System gotowy");
   lcd.setCursor(0, 1);
   lcd.print("Zbliz karte: ");
-
-  pinMode(PIN_BUZZER, OUTPUT);
-  pinMode(PIN_LED_ZIELONA, OUTPUT);
-  pinMode(PIN_LED_CZERWONA, OUTPUT);
-  pinMode(PIN_PRZEKAZNIK, OUTPUT);
-
-  digitalWrite(PIN_BUZZER, LOW);
-  digitalWrite(PIN_LED_CZERWONA, HIGH);
-  digitalWrite(PIN_LED_ZIELONA, LOW);
 }
 
 void loop() {
@@ -95,7 +103,7 @@ void loop() {
         if (wpisanyPin.length() == 4){
           lcd.clear();
           lcd.setCursor(0, 0);
-          lcd.print("Sprawdzanie PINu...");
+          lcd.print("Weryfikacja...");
 
           if (wpisanyPin == tajnyPin){
             obecnyStan = ZAAKCEPTOWANY;
