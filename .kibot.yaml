@@ -1,0 +1,78 @@
+# KiBot configuration — turns the KiCad source into everything a fab house,
+# an assembler and a reviewer need. Run locally with:
+#   kibot -c .kibot.yaml -e hardware/*.kicad_sch -b hardware/*.kicad_pcb -d output
+
+kibot:
+  version: 1
+
+preflight:
+  erc: true               # electrical rule check — fails the build on error
+  drc: true               # design rule check
+  check_zone_fills: true  # catches a stale, unfilled ground pour
+  update_xml: true
+
+outputs:
+  - name: schematic_pdf
+    comment: "Schematic as PDF — what a reviewer actually opens"
+    type: pdf_sch_print
+    dir: docs
+
+  - name: gerbers
+    comment: "Gerbers for JLCPCB"
+    type: gerber
+    dir: production/gerber
+    options:
+      use_protel_extensions: false
+      create_gerber_job_file: true
+      subtract_mask_from_silk: true
+
+  - name: drill
+    comment: "Excellon drill files"
+    type: excellon
+    dir: production/gerber
+    options:
+      metric_units: true
+      pth_and_npth_single_file: false
+
+  - name: bom
+    comment: "Bill of materials, CSV and interactive HTML"
+    type: bom
+    dir: production
+    options:
+      format: CSV
+      group_fields: ['Value', 'Footprint']
+
+  - name: ibom
+    comment: "Interactive BOM — open it on a phone while hand-soldering"
+    type: ibom
+    dir: docs
+
+  - name: position
+    comment: "Pick and place file for assembly"
+    type: position
+    dir: production
+    options:
+      format: CSV
+      units: millimeters
+      separate_files_for_front_and_back: false
+
+  - name: render_3d_top
+    comment: "3D render for the README and LinkedIn"
+    type: render_3d
+    dir: docs/img
+    options:
+      ray_tracing: true
+      width: 1600
+      height: 1200
+      rotate_x: 3
+
+  - name: render_3d_iso
+    comment: "3D render, isometric view"
+    type: render_3d
+    dir: docs/img
+    options:
+      ray_tracing: true
+      width: 1600
+      height: 1200
+      rotate_x: 4
+      rotate_z: 3
