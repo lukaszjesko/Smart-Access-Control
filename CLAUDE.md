@@ -16,7 +16,7 @@ nie poprawiaj go.** Możesz go czytać, żeby wiedzieć, co autor zrobił i zroz
 
 ## Stan projektu (aktualizuj na koniec każdej sesji)
 
-Ostatnia aktualizacja: **2026-09-24**. Wybrany wariant: **B — pełna v1.1**
+Ostatnia aktualizacja: **2026-09-24** (wieczór, po P3). Wybrany wariant: **B — pełna v1.1**
 (wszystkie znane problemy sprzętowe naprawione przed zamówieniem płytek).
 
 **Schemat v1.1 — ZAMKNIĘTY. ERC: 0 błędów, 0 ostrzeżeń.** Zrobione:
@@ -37,14 +37,21 @@ Ostatnia aktualizacja: **2026-09-24**. Wybrany wariant: **B — pełna v1.1**
 - Otwory montażowe H1–H4 (`MountingHole_3.2mm_M3`, bez pada).
 - Drobiazg: R6 ma wartość `2K` zamiast `2k`.
 
-**PCB v1.1 — W TOKU.** Plik PCB jest jeszcze w stanie po naprawie diod
-(D1/D2 przestawione na X=154.46, obrót 180°, wylewka przelana); zmian ze
-schematu v1.1 nie przeniesiono. Plan:
-- **P2 ← NASTĘPNY KROK:** `F8` (Update PCB from Schematic).
-- P3: usunąć stare ścieżki, które po F8 zwierają różne sieci — SPI Nano→J1
-  (SS, MOSI, SCK idą teraz przez dzielniki) oraz buzzer (BZ1 pin 1 jest teraz
-  +5V, pin 2 kolektorem Q1, a nie GND).
-- P4: rozmieszczenie: C1/C2 przy J4, C3/C4 przy J1, dzielniki między Nano a J1,
+**PCB v1.1 — W TOKU.** Schemat i PCB zsynchronizowane (commity `ffbce8a`,
+`a3772ec` wypchnięte, CI zielone). Plan:
+- P2 ✅ `F8` zrobione i zapisane (2026-09-24 21:49): 20 nowych footprintów
+  leży obok płytki, parity 0. DRC po F8: 6 shorting_items, 7 solder_mask_bridge,
+  1 clearance, 1 isolated_copper, 1 track_dangling, 5 silk_overlap,
+  30 unconnected (ratsnest nowych elementów — to normalne).
+- P3 ✅ stare ścieżki usunięte i zapisane (2026-09-24 22:28): całe trasy
+  `/RFID_SDA`, `/RFID_MOSI`, `/RFID_SCK`, `/BUZZER` (z przelotką 141.5,108.0)
+  oraz gałąź GND J4→BZ1 pad 2→(156.12,103.87). DRC: 0 shorting_items,
+  0 solder_mask_bridge; zostały 4 silk_overlap i 1 track_dangling (P7),
+  32 unconnected. Uwagi do P6: przez pomyłkę skasowana też cała
+  `/RFID_MISO` (Nano pin 15 → J1 pad 5) — trzeba ją poprowadzić na nowo;
+  masa J4 pad 2 straciła połączenie (szła przez BZ1). W padzie
+  (156.12,103.87) został nieszkodliwy odcinek GND 0,8 mm.
+- **P4 ← NASTĘPNY KROK:** rozmieszczenie: C1/C2 przy J4, C3/C4 przy J1, dzielniki między Nano a J1,
   Q1/D3/R9 przy buzzerze, TP przy krawędzi, H1–H4 w narożnikach. Płytka
   (53,6 × 61,5 mm) może wymagać powiększenia; jeśli zabraknie miejsca, opcja:
   nowe rezystory w footprincie P7.62 mm zamiast P10.16 mm.
