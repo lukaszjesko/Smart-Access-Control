@@ -77,14 +77,6 @@
         [
           "silk_overlap|146191905|118520000|2d21c1a2-a54d-49de-ada3-a64f0113f203|98c7cb54-ecc6-48ad-8238-1666a96de844",
           ""
-        ],
-        [
-          "silk_overlap|152467683|85841440|383eaba3-0f48-49c0-9607-ba35ccb71a1a|5f9dea4a-13db-47e3-8c3c-75b71575713d",
-          ""
-        ],
-        [
-          "starved_thermal|149982303|109217696|eba0ef3e-b116-42c8-b418-916d529dab6e|623a3d9b-0955-4931-ac2c-438b82972abf|B.Cu",
-          ""
         ]
       ],
       "meta": {
@@ -694,7 +686,7 @@
         "uuid": "0d35483a-0b12-46cc-b9f2-896fd6831779"
       }
     ],
-    "used_designators": "",
+    "used_designators": "D3,#PWR13-27,R3-9,#FLG1,C1-4,Q1,TP1-3,H1-4",
     "variants": []
   },
   "sheets": [
