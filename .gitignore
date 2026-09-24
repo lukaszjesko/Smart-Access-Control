@@ -3,14 +3,8 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
-
-# credentials — never commit
 include/config.h
-
-# VS Code Local History extension
 **/.history/
-
-# KiCad autosaves, backups and lock files
 *-backups/
 *.kicad_prl
 *.lck

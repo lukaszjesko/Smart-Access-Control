@@ -8,8 +8,77 @@ src/main.cpp              firmware (jedyny plik zrodlowy)
 include/config.h          PIN i UID — PRYWATNY, w .gitignore
 include/config.example.h  wzorzec do repo
 Zamek_RFID_Hardware/      projekt KiCad + wyeksportowane gerbery
-docs/lab-notebook.md      dziennik laboratoryjny — uzupełniany po każdej sesji
+docs/lab-notebook.md      dziennik laboratoryjny — pisze go WYŁĄCZNIE autor
 ```
+
+**`docs/lab-notebook.md` to prywatne notatki autora. Nie dopisuj tam niczego i
+nie poprawiaj go.** Możesz go czytać, żeby wiedzieć, co autor zrobił i zrozumiał.
+
+## Stan projektu (aktualizuj na koniec każdej sesji)
+
+Ostatnia aktualizacja: **2026-09-24**. Wybrany wariant: **B — pełna v1.1**
+(wszystkie znane problemy sprzętowe naprawione przed zamówieniem płytek).
+
+**Schemat v1.1 — ZAMKNIĘTY. ERC: 0 błędów, 0 ostrzeżeń.** Zrobione:
+- D1/D2 obrócone (pin → R → anoda, katoda → GND); R1 = 300 Ω (czerwona,
+  Vf≈2 V), R2 = 200 Ω (zielona, założone Vf≈3 V — sprawdzić z kupioną diodą,
+  przy Vf≈2 V dać 300 Ω). Prąd 10 mA.
+- Flagi No Connect na D0, D1, 2×RESET, AREF, A6, A7, VIN; `PWR_FLAG` na GND.
+- Sieć `PRZEKAŹNIK` → `RELAY`.
+- Kondensatory: C1 100 µF/16 V + C2 100 nF na +5V (przy przekaźniku J4),
+  C3 10 µF/16 V + C4 100 nF na +3.3V (przy czytniku J1).
+- Dzielniki 1k/2k (→3,33 V) na liniach Nano→RC522: SS (R3/R5), MOSI (R4/R6),
+  SCK (R7/R8). Sieci po stronie czytnika: `RFID_*_3V3`. MISO bez zmian
+  (3,3 V > próg VIH 3,0 V ATmegi).
+- Buzzer przez BC547 (Q1): A0 → R9 1k → baza, emiter GND, kolektor → BZ1(−),
+  BZ1(+) → +5V, D3 1N4148 równolegle do buzzera (katoda do +5V).
+  Logika w firmware bez zmian: HIGH = gra.
+- Punkty testowe TP1 +3.3V, TP2 GND, TP3 +5V.
+- Otwory montażowe H1–H4 (`MountingHole_3.2mm_M3`, bez pada).
+- Drobiazg: R6 ma wartość `2K` zamiast `2k`.
+
+**PCB v1.1 — W TOKU.** Plik PCB jest jeszcze w stanie po naprawie diod
+(D1/D2 przestawione na X=154.46, obrót 180°, wylewka przelana); zmian ze
+schematu v1.1 nie przeniesiono. Plan:
+- **P2 ← NASTĘPNY KROK:** `F8` (Update PCB from Schematic).
+- P3: usunąć stare ścieżki, które po F8 zwierają różne sieci — SPI Nano→J1
+  (SS, MOSI, SCK idą teraz przez dzielniki) oraz buzzer (BZ1 pin 1 jest teraz
+  +5V, pin 2 kolektorem Q1, a nie GND).
+- P4: rozmieszczenie: C1/C2 przy J4, C3/C4 przy J1, dzielniki między Nano a J1,
+  Q1/D3/R9 przy buzzerze, TP przy krawędzi, H1–H4 w narożnikach. Płytka
+  (53,6 × 61,5 mm) może wymagać powiększenia; jeśli zabraknie miejsca, opcja:
+  nowe rezystory w footprincie P7.62 mm zamiast P10.16 mm.
+- P5: klasa sieci „Power” 0,6 mm dla +5V, +3.3V, GND.
+- P6: routing.
+- P7: sitodruk — opisy J1–J4 (J1 ma odwróconą kolejność względem RC522),
+  wersja „v1.1” i data; usunąć prostokąt narysowany na B.Cu
+  (114.7–159.0 × 73.4–126.5 mm, bez sieci); poprawić nachodzenie napisu D1
+  na D2; wiszący odcinek GND przy (147.10, 101.00).
+- P8: wylewka (`B`), DRC = 0, widok 3D, nowe gerbery (stare w
+  `GERBERY_RFID/` są z 2026-09-02, sprzed poprawek — NIE wysyłać ich), BOM.
+
+**Po PCB:** README jest nieaktualne — twierdzi „ERC clean” i „All fixed in
+v1.1” zanim to była prawda, wskazuje nieistniejące `hardware/` i
+`docs/img/board.jpg`; `.kibot.yaml` szuka plików w `hardware/`. Do poprawy
+po zamknięciu PCB. Dodatkowo `Zamek_RFID_Hardware/Zamek_RFID_Hardware/.history`
+(lokalna historia KiCada, osobne repo git) jest śledzone jako gitlink mimo
+wpisu w `.gitignore` — do usunięcia z indeksu (`git rm --cached`).
+
+## Jak pracujemy (ustalone z autorem)
+
+- Autor sam klika w KiCadzie. Claude daje dokładne instrukcje GUI (klawisz,
+  menu, gdzie kliknąć, co ma się pojawić), a po „zrobione” sprawdza plik:
+  `kicad-cli sch erc`, `kicad-cli pcb drc` (na kopii w scratchpadzie,
+  z `--refill-zones` bez `--save-board`), eksport netlisty i porównanie połączeń.
+- Najpierw krótki plan całego etapu, potem punkt po punkcie. Tempo ma być
+  szybkie: przy każdej zmianie 1–2 zdania „po co”, bez pytań sprawdzających
+  blokujących dalszą pracę. Autor chce umieć wytłumaczyć każdą zmianę
+  rekruterowi — przy nowym temacie daj jedno zdanie „dla rekrutera”.
+- Pułapki, na które autor już trafił: siatka schematu musi być 1,27 mm (piny
+  Nano są między punktami siatki 2,54 mm); jednostki mają być w mm; do
+  zaznaczania jednego typu obiektu służy Selection Filter; symbole `+3V3`
+  i `+3.3V` to RÓŻNE sieci — w projekcie używamy `+3.3V`; nazwa etykiety =
+  sieć, więc obie etykiety tej samej sieci muszą mieć identyczny tekst.
 
 ## O autorze i celu
 
@@ -35,8 +104,8 @@ zrobiłeś i dlaczego, w jednym akapicie.
 - Rozbijaj instrukcje na małe, ponumerowane kroki prostym językiem.
 - Tłumacz DLACZEGO, nie tylko co. Podawaj stronę datasheetu albo normę, jeśli
   wartość z nich wynika.
-- Po nowym temacie zadaj 2–3 pytania sprawdzające i nie idź dalej, dopóki autor
-  nie odpowie poprawnie.
+- Po nowym temacie możesz zadać 1–2 pytania sprawdzające, ale nie blokuj nimi
+  dalszej pracy — autor uznał to za zbyt wolne (sesja 2026-09-24).
 - Kiedy autor się myli, powiedz wprost. Nie łagodź.
 - Nie wymyślaj numerów katalogowych, pinów ani wyników pomiarów. Jak nie wiesz —
   powiedz i sprawdź.
@@ -78,7 +147,7 @@ wtedy poprawić schemat i PCB.
 | D6–D9   | klawiatura, rzędy R1–R4                    |
 | D10     | SS czytnika RC522                          |
 | D11–D13 | SPI: MOSI, MISO, SCK                       |
-| A0      | buzzer aktywny, HIGH = gra                 |
+| A0      | buzzer aktywny przez tranzystor Q1, HIGH = gra |
 | A1      | LED zielona                                |
 | A2      | LED czerwona                               |
 | A3      | przekaźnik — **LOW załącza**, HIGH zwalnia |
@@ -98,7 +167,8 @@ klawiatury.
 - IRQ czytnika jest niepodłączony — odczyt tylko przez odpytywanie w `loop()`.
 - RC522 zasilany z pinu 3V3 Nano. To słabe źródło, a czytnik ciągnie w impulsie
   ~100 mA. Przy losowych nieodczytach to pierwszy podejrzany, nie kod.
-- W projekcie nie ma żadnego kondensatora odsprzęgającego.
+  W v1.1 wspiera go para C3 10 µF + C4 100 nF przy J1.
+- Linie SS, MOSI, SCK idą do czytnika przez dzielniki 1k/2k (v1.1).
 - Złącze J1 ma kolejność odwróconą względem modułu RC522 — pin 1 płytki trafia
   na pin 8 modułu. Działa, ale wymaga opisu na sitodruku.
 
@@ -166,24 +236,16 @@ zgłaszał w kółko jako nowych odkryć.
 - `pokazLinie()` jest zdefiniowana, ale jeszcze nieużywana.
 - Klawisze `*`, `#` i `A`–`D` trafiają do bufora PIN-u.
 - Autoryzacja po samym UID — UID karty MIFARE Classic łatwo sklonować.
-- Buzzer sterowany wprost z pinu A0, bez tranzystora.
 
-## Znane problemy sprzętowe — do poprawienia w KiCadzie przez autora
+## Znane problemy sprzętowe
 
-1. **KRYTYCZNE: obie diody LED są na schemacie wpięte odwrotnie.** Katoda idzie
-   przez rezystor do pinu Arduino, anoda do masy — tak połączona dioda nie
-   zaświeci się nigdy, niezależnie od kodu. Potwierdzone w pliku PCB:
-   `D1 pad 1 (K) → Net-(D1-K) → R1 → A2`, `D1 pad 2 (A) → GND`.
-   Poprawnie: pin Arduino → rezystor → anoda, katoda → masa.
-   Obejście przy montażu: wlutować diody obrócone o 180°.
+Naprawione na schemacie v1.1 (szczegóły w sekcji „Stan projektu”): odwrócone
+diody LED, brak kondensatorów, brak wartości R/LED, brak otworów montażowych,
+poziomy logiczne SPI, buzzer bez tranzystora, polski znak w nazwie sieci.
+
+Nadal otwarte:
+1. Wszystkie ścieżki 0,25 mm, łącznie z +5V i GND — brak klas sieci (krok P5).
 2. Kolejność pinów na złączu klawiatury J2 (C4 C3 C2 C1 R1 R2 R3 R4) nie
    odpowiada typowej taśmie klawiatury membranowej (R1 R2 R3 R4 C1 C2 C3 C4).
    Do sprawdzenia z konkretnym egzemplarzem. Jeśli się nie zgadza, poprawka jest
    w tablicy `keys[][]` albo w `rowPins`/`colPins`, nie na płytce.
-3. Brak kondensatorów odsprzęgających — przynajmniej 100 nF + 10 µF przy RC522.
-4. Rezystory R1, R2 i diody D1, D2 nie mają wartości w polu Value — BOM jest
-   nie do wyprodukowania.
-5. Brak otworów montażowych.
-6. Wszystkie ścieżki 0,25 mm, łącznie z +5V i GND — brak klas sieci.
-7. Poziomy logiczne: SPI z Nano na 5V, a MFRC522 dopuszcza max VDD+0,5V.
-8. Nazwa sieci `/PRZEKAŹNIK` zawiera polski znak.
