@@ -10,3 +10,4 @@ include/config.h
 *.lck
 *~
 fp-info-cache
+CLAUDE.md
