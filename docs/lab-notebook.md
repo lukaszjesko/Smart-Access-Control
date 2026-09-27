@@ -19,3 +19,12 @@ dodane kondensatory elektrolityczne, mają dużą pojemność ale w środku maj�
 ceramiczny 100nF mała pojemność, prawie bez indukcyjności działa na MHz, jest od dłuższych spadków napięcia 
 
 podłączenie buzzera do bazy tranzysotra, strzałka na tranzystorze - emiter, dida do wciągania prądu który cofa się z cewki buzzera, 
+
+jeśłi zasilanie to ścieżka 0.6 mm, zwykły sygnał to cienka ścieżka - opisanie klas 
+tworzenie klasy - clearance - odstęp od innych wierszy, 
+
+"pierścieniem" (annular ring) - przelotka 0.6 mm wiertło 0.4 mm - zostaje po 0.1 mm, rozwiązanie - zmniejszenie wiertła 
+
+przy wylewce na spodzie siatka na 0.5mm - strefa 0.5 wewnątrz krawędzi 
+clearance 0.3 zamiast 0.2 - wylewka dlaje od ścieżek, mniejsze ryzyko mostka cyny, 
+pad connnections - thermal relief, 
