@@ -14,9 +14,19 @@ Wpisuję też porażki — one są najcenniejsze.
 anoda dłuższa wchodzi prąd, katoda krótsza ścieta do gnd ok na stykówce ale źle na schemacie 
 siatka była ustawiona 2.54 a nie 1,27 przez co nie mozna było ustwić punktów q, bo wielokrotności arduino nano to 1.27 
 
-dodane kondensatory elektrolityczne, mają dużą pojemność ale w środku mają zwiniętą folię która ma indukcyjność, więc przy szybkich zmianach nie nadąża, jest od dłużych spadków napięcia 
+ceramiczny 100 nF: mała pojemność, prawie bez indukcyjności 
+reaguje w nanosekundach, ale szybko się opróżnia
+Od KRÓTKICH szpilek prądu — każde przełączenie układu cyfrowego
+zegar Arduino 16 MHz
+Przy 70 mA i spadku 0,25 V wystarcza na 0,36 µs
 
-ceramiczny 100nF mała pojemność, prawie bez indukcyjności działa na MHz, jest od dłuższych spadków napięcia 
+elektrolityczny 100 µF: 1000× większa pojemność, ale zwinięta folia
+działa jak cewka reaguje wolniej.
+Od DŁUŻSZYCH spadków, milisekundy załączenie przekaźnika, buzzera
+Przy 70 mA i spadku 0,25 V wystarcza na 0,36 ms
+
+Dlatego dajemy oba: ceramik łapie szybkie, elektrolit długie.
+Ceramik jak najbliżej pinu zasilania — każdy mm ścieżki to dodatkowa indukcyjność.
 
 podłączenie buzzera do bazy tranzysotra, strzałka na tranzystorze - emiter, dida do wciągania prądu który cofa się z cewki buzzera, 
 
