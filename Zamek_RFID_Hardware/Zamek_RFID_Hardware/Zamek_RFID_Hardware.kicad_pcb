@@ -399,7 +399,7 @@
 				)
 			)
 		)
-		(property "Value" "2K"
+		(property "Value" "2k"
 			(at 5.08 2.37 270)
 			(layer "F.Fab")
 			(uuid "8643a27c-44c5-4bf3-81cb-5ac1238a8af1")
