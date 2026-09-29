@@ -38,3 +38,13 @@ tworzenie klasy - clearance - odstęp od innych wierszy,
 przy wylewce na spodzie siatka na 0.5mm - strefa 0.5 wewnątrz krawędzi 
 clearance 0.3 zamiast 0.2 - wylewka dlaje od ścieżek, mniejsze ryzyko mostka cyny, 
 pad connnections - thermal relief, 
+
+przy gerberach zaznaczyć - subtract soldermask from silkscreen - farba nie wejdzie na pady
+Use Protel filename - końcówki które firmy rozpoznają automatycznie, po zaznaczeniu - plot
+-PTH.drl plik - pady, otwory metalizowane, -NPTH.drl - 4 otwory montażowe, niemetalizowane
+BOM -> edytor schematu -> Tools -> Generate Bill of Materials → CSV do tego pliku - > export 
+
+NPTH = 4x M3 mounting
+holes - osobne pliki wierceń metalizowanych i niemetalizowanych (NPTH to
+4 otwory M3)
+
