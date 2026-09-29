@@ -15,4 +15,3 @@
 "R2","200","","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","1",""
 "R3,R4,R7,R9","1k","","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","4",""
 "R5,R6,R8","2k","","Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal","3",""
-"TP1,TP2,TP3","TestPoint","","TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm","3",""
