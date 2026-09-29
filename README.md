@@ -5,7 +5,9 @@ something you **have** (a 13.56 MHz contactless card) with something you
 **know** (a 4-digit PIN), driving an electric strike through a relay.
 
 
-![Assembled board](docs/img/board.jpg)
+![PCB v1.1, top side](docs/img/pcb_v1.1_top.png)
+
+*PCB v1.1 rendered from the fabrication Gerbers. A photo of the assembled board replaces it after bring-up.*
 
 ---
 
@@ -13,15 +15,15 @@ something you **have** (a 13.56 MHz contactless card) with something you
 
 | Stage | State |
 |---|---|
-| Firmware | Working — validated on breadboard |
-| Schematic | Complete, ERC clean |
-| PCB layout | v1.0 routed, 2-layer, 53.6 × 61.5 mm |
-| Fabrication | v1.1 in preparation — v1.0 was **not** ordered; review caught blocking errors first |
-| Bring-up measurements | Pending |
+| Firmware | Working on a breadboard |
+| Schematic v1.1 | Complete, ERC clean |
+| PCB v1.1 | 2-layer, 72 × 57 mm, all 28 nets routed, DRC clean |
+| Fabrication | **v1.1 ordered 29 Sep 2026** (JLCPCB, 5 pcs) — files in [`fab/v1.1`](Zamek_RFID_Hardware/fab/v1.1) |
+| Assembly and bring-up | Pending — boards expected mid-October |
 
-This is an active learning project. Section
-[Known limitations](#known-limitations) lists what I found wrong in v1.0
-and why. I consider that list the most useful part of this repository.
+v1.0 was never manufactured: a design review found blocking errors first.
+[What the review caught](#what-the-v10-review-caught--fixed-in-v11) is the part
+of this repository I would point a reviewer to first.
 
 ---
 
@@ -97,10 +99,15 @@ removes the glitch. A lock that opens on every power cycle is not a lock.
 **RFID reader on a connector, not on the board.**
 The MFRC522 carries a tuned 13.56 MHz antenna. Putting an untuned antenna on
 my own two-layer board would have meant an RF design problem I was not ready
-to solve, so v1.0 uses the module on a header.
+to solve, so the module plugs into a header on a cable. That is also how a
+door installation needs it: the reader outside, the controller inside.
 
-**Ground pour on the bottom layer** to shorten return paths for the SPI bus
-and give the relay switching current somewhere low-impedance to go.
+**GND pour on both layers and a 0.6 mm power net class** to shorten return
+paths for the SPI bus and give the relay switching current somewhere
+low-impedance to go. Signals stay at 0.25 mm.
+
+**The relay module switches the strike, not this board.** The strike's supply
+goes to the module's own screw terminals; the board only drives its IN line.
 
 ---
 
@@ -108,7 +115,7 @@ and give the relay switching current somewhere low-impedance to go.
 
 Honest assessment of this design. None of these are hypothetical.
 
-| Weakness | Impact | Mitigation in v1.1 |
+| Weakness | Impact | Planned mitigation (firmware) |
 |---|---|---|
 | Authentication uses only the card **UID** | MIFARE Classic UIDs are readable by any phone with NFC and writable on cheap magic cards, so the card factor can be cloned in under a minute | Move to MIFARE DESFire EV3 with AES challenge–response, where the key never crosses the air interface |
 | No lockout on failed PIN attempts | 4 digits is 10 000 combinations against a fixed 2 s penalty — roughly 5.5 hours of unattended guessing | Lock out after 5 attempts with exponential backoff, persisted to EEPROM so a power cycle does not reset it |
@@ -126,38 +133,34 @@ where v2 is headed.
 
 ---
 
-## Known limitations
+## What the v1.0 review caught — fixed in v1.1
 
-Found during review of v1.0. All fixed in v1.1 before fabrication.
+| Problem in v1.0 | Consequence | Fix in v1.1 |
+|---|---|---|
+| Both status LEDs wired in reverse — the MCU pin drove the cathode, the anode sat at GND | The LEDs could never light, whatever the firmware did | Polarity corrected and verified pad by pad in the board file |
+| No decoupling capacitors at all | A supply dip when the relay switched, which I had masked in firmware | 100 nF + 100 µF on 5 V, 100 nF + 10 µF at the reader |
+| 5 V SPI into the 3.3 V MFRC522, whose inputs are rated to VDD + 0.5 V | Inputs out of specification | 1 kΩ / 2 kΩ dividers on SS, MOSI and SCK (3.33 V); MISO direct |
+| Buzzer driven straight from a GPIO | Close to the ATmega328P per-pin limit, inductive kick unclamped | BC547 driver with a 1N4148 flyback diode |
+| Every net at 0.25 mm, +5 V and GND included | No margin on the power paths | `Power` net class at 0.6 mm, GND pour on both layers |
+| No mounting holes | The board could not be fixed in an enclosure | 4 × M3 |
+| No test points, connectors unlabelled | Hard to measure and easy to wire wrong | Test points on 3V3, 5V and GND; every connector pin labelled on the silkscreen |
+
+## Open items
 
 **Hardware**
-- **Both status LEDs are reversed in the schematic.** The Arduino pin drives the
-  cathode through the resistor and the anode sits at ground, so the LEDs are
-  reverse-biased and can never light, whatever the firmware does. Verified in the
-  board file: `D1 pad 1 (K) -> Net-(D1-K) -> R1 -> A2`, `D1 pad 2 (A) -> GND`.
-  Caught during review before fabrication, which is exactly why a board gets
-  reviewed before money is spent on it.
-- **Keypad connector order does not match a standard membrane ribbon.** J2 is
-  wired C4 C3 C2 C1 R1 R2 R3 R4; the usual flat cable is R1 R2 R3 R4 C1 C2 C3 C4.
-  To be confirmed against the actual keypad, then fixed in `keys[][]` rather
-  than on the board.
-- No decoupling capacitors. Every IC needs 100 nF at its supply pin, plus bulk
-  capacitance at the board input. The supply dip I worked around in firmware
-  was a hardware problem.
-- All nets routed at 0.25 mm, including +5 V and GND. Power nets need their
-  own net class at 0.5–0.8 mm.
-- No mounting holes. The board cannot be fixed to an enclosure.
-- Buzzer driven directly from a GPIO pin, above the recommended per-pin
-  current for the ATmega328P. Needs a transistor and a flyback diode.
-- MFRC522 SPI lines driven at 5 V logic, while the datasheet limits inputs to
-  VDD + 0.5 V. Needs level shifting on MOSI, SCK and SS.
-- Reader reset line left unconnected, so a hung reader cannot be recovered.
+- Keypad connector J2 is wired C4 C3 C2 C1 R1 R2 R3 R4, while a typical membrane
+  ribbon runs R1 R2 R3 R4 C1 C2 C3 C4. To be checked on the real keypad; the fix
+  belongs in `keys[][]`, not on the board.
+- The reader's RST pin is tied to 3.3 V, so the MCU cannot hard-reset a hung
+  reader — software reset only.
 
-**Firmware**
-- Uses `String` on a 2 kB RAM part — heap fragmentation risk. Replace with a
-  fixed `char` buffer.
+**Firmware** — unchanged since v1.0, next milestone after bring-up
+- `String` on a 2 kB RAM part risks heap fragmentation — replace with a fixed
+  `char` buffer.
 - `delay()` inside the state machine blocks the keypad and reader for up to
-  3 seconds. Replace with `millis()`-based timing.
+  3 seconds — replace with `millis()` timing.
+- No timeout after a valid card and no lockout after failed PINs (see the
+  security analysis).
 - No check that the reader is present at boot; an unplugged module fails
   silently.
 - Successful UIDs are printed to the serial port.
@@ -167,12 +170,15 @@ Found during review of v1.0. All fixed in v1.1 before fabrication.
 ## Repository layout
 
 ```
-├── src/                     firmware (PlatformIO, Arduino framework)
-├── include/
-│   └── config.example.h     copy to config.h and fill in — config.h is gitignored
-├── hardware/                KiCad 10 project
-│   └── production/          Gerber + drill files
-└── docs/img/                photos and renders
+├── src/main.cpp                       firmware (PlatformIO, Arduino framework)
+├── include/config.example.h           copy to config.h — config.h is gitignored
+├── Zamek_RFID_Hardware/
+│   ├── Zamek_RFID_Hardware/           KiCad 10 project: schematic and PCB
+│   └── fab/v1.1/                      Gerbers, drill files and BOM sent to the fab
+└── docs/
+    ├── lab-notebook.md                what I did, measured and learned — failures included
+    ├── zakupy_v1.1.md                 parts list for assembling v1.1
+    └── img/                           renders now, photos after bring-up
 ```
 
 ## Build
@@ -183,7 +189,3 @@ pio run --target upload
 ```
 
 Requires [PlatformIO](https://platformio.org/). Target: `nanoatmega328new`.
-
-## Licence
-
-Firmware: MIT. Hardware: [CERN-OHL-S-2.0](https://ohwr.org/cern_ohl_s_v2.txt).
