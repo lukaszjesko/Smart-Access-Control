@@ -1,6 +1,6 @@
 # KiBot configuration — turns the KiCad source into everything a fab house,
 # an assembler and a reviewer need. Run locally with:
-#   kibot -c .kibot.yaml -e hardware/*.kicad_sch -b hardware/*.kicad_pcb -d output
+#   kibot -c .kibot.yaml -e Zamek_RFID_Hardware/Zamek_RFID_Hardware/*.kicad_sch -b Zamek_RFID_Hardware/Zamek_RFID_Hardware/*.kicad_pcb -d output
 
 kibot:
   version: 1
