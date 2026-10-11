@@ -1,98 +1,59 @@
-# Smart Access Control (RFID + PIN door lock)
+# Smart Access Control
 
-Door lock controller on my own PCB. To open the door you need a 13.56 MHz
-RFID card and a 4-digit PIN. An Arduino Nano checks both and switches a 12 V
-electric strike through a relay.
+A door lock controller on my own PCB. To open the door you need the right RFID card
+and the right 4-digit PIN. An Arduino Nano checks both and switches a 12 V door strike
+through a relay.
+
+This is the first PCB I designed and ordered. I drew v1.0 in KiCad, found a lot of
+mistakes during a review, fixed them in v1.1 and ordered v1.1 from JLCPCB.
 
 | Top | Bottom |
 |---|---|
 | ![PCB top](docs/img/pcb_v1.1_top.png) | ![PCB bottom](docs/img/pcb_v1.1_bottom.png) |
 
-*PCB v1.1 rendered from the Gerber files. Photos of the assembled board will
-replace these renders.*
+*Renders of v1.1. I'll replace them with photos when the board is assembled.*
 
-## Status
+## What's on the board
 
-- [x] Firmware tested on a breadboard
-- [x] Schematic and PCB v1.0 in KiCad
-- [x] Review of v1.0, fixes in v1.1
-- [x] PCB v1.1 ordered from JLCPCB ([fabrication files](Zamek_RFID_Hardware/fab/v1.1))
-- [ ] v1.1 assembled and tested
-- [ ] Firmware changes for v1.1 (see TODO)
+Arduino Nano, MFRC522 RFID reader (as a module on a header), 4x4 keypad, 16x2 LCD over
+I2C, relay module, buzzer and two LEDs.
 
-## How it works
+The firmware is a simple state machine: wait for a card, wait for the PIN, open or deny,
+then back to waiting.
 
-| Part | Interface |
-|---|---|
-| Arduino Nano (ATmega328P) | controller |
-| MFRC522 RFID reader, module on a header | SPI |
-| 4x4 keypad | GPIO |
-| 16x2 LCD with I2C adapter | I2C |
-| Relay module (active LOW) | GPIO |
-| Buzzer, green LED, red LED | GPIO |
+Schematic: [docs/schematic_v1.1.pdf](docs/schematic_v1.1.pdf).
+KiCad project: [Zamek_RFID_Hardware/](Zamek_RFID_Hardware/Zamek_RFID_Hardware).
 
-The firmware is a state machine:
+## Mistakes in v1.0 that I fixed in v1.1
 
-`WAIT_FOR_CARD -> WAIT_FOR_PIN -> ENTERING_PIN -> GRANTED / DENIED -> WAIT_FOR_CARD`
+- Both LEDs were wired backwards, so they could never light up.
+- There were no decoupling capacitors. I had a supply dip that I worked around in
+  firmware, but the real problem was in hardware.
+- Every track was 0.25 mm, including power. Now power tracks are 0.6 mm and there is
+  a ground pour on both layers.
+- The Nano sent 5 V signals into the 3.3 V RFID reader. Now there are 1k/2k resistor
+  dividers on MOSI, SCK and SS.
+- The buzzer was driven straight from a pin. Now it goes through a BC547 transistor
+  with a flyback diode.
+- No mounting holes and no test points. Now there are four M3 holes and test points on
+  5 V, 3.3 V and GND.
 
-The door opens only when both the card and the PIN are correct. The red LED is
-on while the door is locked. If the card or the PIN is wrong, the buzzer beeps.
+## A bug I liked
 
-The full pin map is in the [schematic (PDF)](docs/schematic_v1.1.pdf). The
-KiCad project is in [`Zamek_RFID_Hardware/`](Zamek_RFID_Hardware/Zamek_RFID_Hardware).
+The relay module is active LOW, so at power-up the door opened for a split second
+before the program set the pin. Writing HIGH to the pin before `pinMode()` fixed it.
 
-## Design notes
+## Not done yet
 
-- The MFRC522 stays as a module on a header. It already has a tuned 13.56 MHz
-  antenna, and designing my own antenna was out of scope.
-- The relay module is active LOW. At power-up the strike opened for a moment,
-  because the pin went LOW when it became an output. Writing HIGH to the pin
-  before `pinMode()` fixed it.
-- The board only drives the relay module's input. The strike and its 12 V
-  supply connect to the relay module's own screw terminals.
-
-## What I changed after the v1.0 review
-
-- Fixed both status LEDs. In v1.0 they were wired in reverse and could never
-  light up.
-- Added decoupling: 100 nF + 100 uF on 5 V at the relay connector and
-  100 nF + 10 uF on 3.3 V at the reader. A supply dip I had worked around in
-  firmware was actually a hardware problem.
-- Moved power nets to their own net class (0.6 mm) and added a GND pour on both
-  layers. In v1.0 every track was 0.25 mm.
-- Added level shifting on MOSI, SCK and SS (1k/2k dividers, 3.33 V). The
-  MFRC522 runs at 3.3 V and its inputs allow at most VDD + 0.5 V, so 5 V from
-  the Nano was out of spec.
-- The buzzer is now driven through a BC547 transistor with a flyback diode, not
-  directly from a GPIO pin.
-- Added 4 M3 mounting holes, test points on 5 V, 3.3 V and GND, pin 1 marks and
-  silkscreen labels for every connector pin.
-
-## Limitations
-
-This is a learning project, not a product.
-
-- Only the card UID is checked. MIFARE Classic UIDs can be read and copied to
-  cheap cards.
-- There is no lockout after wrong PINs.
-- The PIN is stored in plain text in the firmware.
-- The reader's reset pin is tied to 3.3 V, so the Nano can only reset the
-  reader in software.
-- Someone with access to the inside of the installation can bridge the relay.
-
-## TODO
-
-- [ ] Replace `String` with a fixed `char` buffer (the ATmega328P has 2 kB of RAM)
-- [ ] Replace `delay()` in the state machine with `millis()` timing
-- [ ] 15 s timeout after a valid card
-- [ ] Lockout after 5 wrong PINs, counter stored in EEPROM
-- [ ] Check at boot that the RFID reader responds
-- [ ] Stop printing card UIDs to the serial port
-- [ ] Check the keypad connector order (J2) against the real keypad
+- Assemble and test v1.1
+- Firmware: replace `String` with a `char` buffer, replace `delay()` with `millis()`,
+  lock the keypad after 5 wrong PINs
+- Security: only the card UID is checked, and a UID can be copied to a cheap card.
+  The PIN is stored in the firmware as plain text.
 
 ## Build
 
-PlatformIO, target `nanoatmega328new`.
+PlatformIO, target `nanoatmega328new`:
 
 ```bash
 cp include/config.example.h include/config.h   # set your card UID and PIN
