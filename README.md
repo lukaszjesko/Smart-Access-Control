@@ -4,6 +4,10 @@ A door lock controller on my own PCB. To open the door you need the right RFID c
 and the right 4-digit PIN. An Arduino Nano checks both and switches a 12 V door strike
 through a relay.
 
+![PCB 3D render](docs/img/pcb_3d.png)
+
+*KiCad 3D render*
+
 This is the first PCB I designed and ordered. I drew v1.0 in KiCad, found a lot of
 mistakes during a review, fixed them in v1.1 and ordered v1.1 from JLCPCB.
 
@@ -17,6 +21,8 @@ mistakes during a review, fixed them in v1.1 and ordered v1.1 from JLCPCB.
 
 Arduino Nano, MFRC522 RFID reader (as a module on a header), 4x4 keypad, 16x2 LCD over
 I2C, relay module, buzzer and two LEDs.
+
+![PCB top view](docs/img/pcb_top.png)
 
 The firmware is a simple state machine: wait for a card, wait for the PIN, open or deny,
 then back to waiting.
