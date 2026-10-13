@@ -93,10 +93,10 @@
 		(aux_axis_origin 100 100)
 		(grid_origin 100 100)
 		(pcbplotparams
-			(layerselection 0x00000000_00000000_55555555_5755f5ff)
+			(layerselection 0x00000000_00000000_55555555_575555ff)
 			(plot_on_all_layers_selection 0x00000000_00000000_00000000_00000000)
 			(disableapertmacros no)
-			(usegerberextensions no)
+			(usegerberextensions yes)
 			(usegerberattributes yes)
 			(usegerberadvancedattributes yes)
 			(creategerberjobfile yes)
@@ -121,12 +121,12 @@
 			(hidednponfab no)
 			(sketchdnponfab yes)
 			(crossoutdnponfab yes)
-			(subtractmaskfromsilk no)
+			(subtractmaskfromsilk yes)
 			(outputformat 1)
 			(mirror no)
 			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "C:/Users/lukas/OneDrive/Pulpit/Smart-access-control/Zamek_RFID_Hardware/GERBERY_RFID/")
+			(outputdirectory "C:/Users/lukas/OneDrive/Pulpit/Smart-access-control/Zamek_RFID_Hardware//fab/v1.1/")
 		)
 	)
 	(footprint "Package_TO_SOT_THT:TO-92_Inline"
@@ -432,18 +432,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "fba06a54-8166-4c05-98bd-c25b81c9f24e")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property ki_fp_filters "R_*")
 		(path "/1e16d7e9-788e-4428-b39c-765fbd1124ee")
 		(sheetname "/")
@@ -620,18 +608,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "mounting_hardware/mounting_hole"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "00a74a79-a34a-4ea9-83eb-7733bfe09025")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -1230,18 +1206,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "mounting_hardware/mounting_hole"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "caf79b52-87b5-4ae7-826f-e1ca2a991d43")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property ki_fp_filters "MountingHole*")
 		(path "/60fe0480-488c-41a0-8dbc-3911f09e0ea9")
 		(sheetname "/")
@@ -1360,6 +1324,7 @@
 				(pins "1")
 			)
 		)
+		(attr exclude_from_bom)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_circle
 			(center 0 0)
@@ -1454,18 +1419,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "capacitor/THT/other"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "29d41dc4-90e8-4c52-86ae-de0f95888f3b")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -1654,18 +1607,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "15a8d2e3-ecc9-43f6-9049-ed0821747cd9")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -1858,18 +1799,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "capacitor/THT/other"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "f08c2988-0977-45bc-b025-52e123a4edb2")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -3393,18 +3322,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "capacitor/THT/other"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "feb450a4-8461-455f-b01a-895336151ced")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property ki_fp_filters "C_*")
 		(path "/6cb873a4-6929-4671-8399-eae054266e68")
 		(sheetname "/")
@@ -3590,18 +3507,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "capacitor/THT/other"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "8fe34fc5-0a1c-4d71-8d18-a0aebdb7936a")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -4955,18 +4860,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "diode/THT"
-			(at 0 0 180)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "a1754295-83d8-443b-9d05-6479a0599e92")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property "Sim.Device" "D"
 			(at 0 0 180)
 			(unlocked yes)
@@ -5470,18 +5363,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "mounting_hardware/mounting_hole"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "b129910f-ab7e-4978-b11c-bec59e2fae9d")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property ki_fp_filters "MountingHole*")
 		(path "/be3fcaa3-bbce-459d-b830-1e7c5e197e62")
 		(sheetname "/")
@@ -5583,18 +5464,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "5e04a4eb-0e9e-40d2-b37d-47e80800cfe5")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -5787,18 +5656,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 180)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "e0a14a2f-a534-4131-ac2d-a200daf6c880")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -5995,6 +5852,7 @@
 				(pins "1")
 			)
 		)
+		(attr exclude_from_bom)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_circle
 			(center 0 0)
@@ -6387,18 +6245,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "d78e7b65-544b-4e4b-88b2-dd4c05890ad2")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property ki_fp_filters "R_*")
 		(path "/aa5f35e3-2c94-4b55-915e-c9947fbb6561")
 		(sheetname "/")
@@ -6592,6 +6438,7 @@
 				(pins "1")
 			)
 		)
+		(attr exclude_from_bom)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_circle
 			(center 0 0)
@@ -6686,18 +6533,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "b136fc9d-6480-40db-8d64-1a1450e6bc22")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -7056,18 +6891,6 @@
 			(effects
 				(font
 					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "KiLib_Generator" "resistor/THT"
-			(at 0 0 270)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "5e8519f5-9cb2-4053-966e-2da1dbc910c0")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
 				)
 			)
 		)
@@ -7737,18 +7560,6 @@
 				)
 			)
 		)
-		(property "KiLib_Generator" "mounting_hardware/mounting_hole"
-			(at 0 0 0)
-			(layer "F.SilkS")
-			(hide yes)
-			(uuid "4c090736-28ad-43c0-a1aa-bdce060c16db")
-			(effects
-				(font
-					(size 1 1)
-					(thickness 0.15)
-				)
-			)
-		)
 		(property ki_fp_filters "MountingHole*")
 		(path "/cc9f210d-4a93-4b95-9bbd-30993069fe1c")
 		(sheetname "/")
@@ -7812,7 +7623,7 @@
 		(property "Reference" "A1"
 			(at -3.375001 19.05 0)
 			(layer "F.SilkS")
-			(uuid "2ff51278-336a-4b96-b1c2-9a7d26640c29")
+			(uuid "02256105-20ba-4581-8a2d-5e50818d6647")
 			(effects
 				(font
 					(size 1 1)
@@ -7823,7 +7634,7 @@
 		(property "Value" "Arduino_Nano_v3.x"
 			(at 8.89 19.05 90)
 			(layer "F.Fab")
-			(uuid "5b158185-5322-4bee-9575-8c2a555c1673")
+			(uuid "a748e810-5558-44b8-96ed-f9f789da1f6c")
 			(effects
 				(font
 					(size 1 1)
@@ -7836,7 +7647,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "e746c4d4-ba1b-4f67-b8bc-0116f298c995")
+			(uuid "3cc68775-7247-4139-9e78-a14e62eb857d")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7849,7 +7660,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "a037ffd1-a76b-47e6-b9eb-a03d200f788d")
+			(uuid "8bad6148-0f5e-47b2-b4b8-2b064ee1fa3b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8536,15 +8347,15 @@
 			(uuid "4f701336-d5d8-4252-bdd6-8ea0e78521db")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Module.3dshapes/Arduino_Nano_WithMountingHoles.step"
+		(model "${KIPRJMOD}/3d/Arduino_Nano.step"
 			(offset
-				(xyz 0 0 0)
+				(xyz 7.62 -17.78 0)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
