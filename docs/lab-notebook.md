@@ -48,3 +48,32 @@ NPTH = 4x M3 mounting
 holes - osobne pliki wierceń metalizowanych i niemetalizowanych (NPTH to
 4 otwory M3)
 
+gerber po jednym pliku na warstwę, drl - jakim wiertłem gdzie i jak wiercić
+
+zamawianie na stronie - outer copper weight 1 oz, 35 um miedzi tak jak w projkecie , 1 oz miedzi przy ścieżce 0,6mm 
+spokojnie wystarcza na prąd przekaźnika i czytnika 
+
+## 2026-10-18
+
+lutowanie od najniższych: rezystory, D3, C2 C4, Q1, podstawki nano, goldpiny, ledy, elektrolity, buzzer
+pady GND na wylewce, cyna nie przechodzi na drugą stronę, wylewka odciąga ciepło, 
+
+
+test zwarć TP3-TP2, TP1-TP2, TP3-TP1 przed i po lutowaniu - nic nie piszczy (z elektrolitem krótki pisk - kondensator się ładuje)
+vf zielonej led 1,91 V (5V z nano przez 300 om) R2 = 300 om, ok 10 mA. 
+multimetr w trybie diody pokazuje OL powyżej ok 2 V
+bez modułów TP3 4,46 V, TP1 3,28 V
+LCD, RFID, klawiatura działają za pierwszym razem, klawiatura pin w pin (C4 na kwadratowy pad)
+
+problem: przekaźnik nie klika, dioda na module świeci, ekran przygasa przy otwarciu
+ekran przygasa = spada napięcie na całej szynie 5V, nie wina samego przekaźnika
+przekaźnik SRD-05VDC potrzebuje min 75% napięcia = 3,75 V
+TP3: 3,94 V spoczynek, 3,44 V z przekaźnikiem, za mało
+inny kabel - to samo, kabel odpada
+ładowarka zamiast laptopa, to samo,laptop odpada
+pin 5V na nano tyle samo co TP3 moja płytka odpada
+na spodzie nano dioda S4 między USB a 5V
+
+nano poza płytką, przekaźnik wprost do nano, przed diodą 5,06 V, za diodą 3,8, dioda zabiera 1,26 V (schottky powinien ok 0,3 V)
+wniosek: zła dioda w klonie nano, wymiana na MBR0520LT1G (SOD-123, ten sam typ co w oryginalnym nano)
+zasada - mierzyć punkt po punkcie wzdłuż drogi prądu, zmieniać jedną rzecz naraz
