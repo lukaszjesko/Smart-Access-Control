@@ -4,30 +4,33 @@ A door lock controller on my own PCB. To open the door you need the right RFID c
 and the right 4-digit PIN. An Arduino Nano checks both and switches a 12 V door strike
 through a relay.
 
-![PCB 3D render](docs/img/pcb_3d.png)
-
-*KiCad 3D render*
+| KiCad 3D render | Assembled board |
+|---|---|
+| ![KiCad 3D render](docs/img/pcb_3d.png) | ![Assembled board](docs/img/board_v1.1_assembled.jpg) |
 
 This is the first PCB I designed and ordered. I drew v1.0 in KiCad, found a lot of
 mistakes during a review, fixed them in v1.1 and ordered v1.1 from JLCPCB.
-
-| Top | Bottom |
-|---|---|
-| ![PCB top](docs/img/pcb_v1.1_top.png) | ![PCB bottom](docs/img/pcb_v1.1_bottom.png) |
-
-*Renders of v1.1. I'll replace them with photos when the board is assembled.*
 
 ## What's on the board
 
 Arduino Nano, MFRC522 RFID reader (as a module on a header), 4x4 keypad, 16x2 LCD over
 I2C, relay module, buzzer and two LEDs.
 
-![PCB top view](docs/img/pcb_top.png)
+![Board with all modules connected](docs/img/board_v1.1_working.jpg)
 
 The firmware is a simple state machine: wait for a card, wait for the PIN, open or deny,
 then back to waiting.
 
-Schematic: [docs/schematic_v1.1.pdf](docs/schematic_v1.1.pdf).
+![Schematic](docs/img/schematic_v1.1.png)
+
+| Routing (ground pour hidden) | All copper layers |
+|---|---|
+| ![PCB routing](docs/img/pcb_v1.1_layout.png) | ![PCB with ground pour](docs/img/pcb_v1.1_layers.png) |
+
+*Red = top copper, blue = bottom copper. On the left the ground pour is hidden so
+the tracks are visible.*
+
+Schematic as PDF: [docs/schematic_v1.1.pdf](docs/schematic_v1.1.pdf).
 KiCad project: [Zamek_RFID_Hardware/](Zamek_RFID_Hardware/Zamek_RFID_Hardware).
 
 ## Mistakes in v1.0 that I fixed in v1.1
